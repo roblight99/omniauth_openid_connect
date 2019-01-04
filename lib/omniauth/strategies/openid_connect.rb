@@ -243,7 +243,12 @@ module OmniAuth
       def parse_jwk_key(key)
         json = JSON.parse(key)
         if json.has_key?('keys')
-          JSON::JWK::Set.new json['keys']
+          set = JSON::JWK::Set.new json['keys']
+          if set.length == 1
+            set[0]
+          else
+            set
+          end  
         else
           JSON::JWK.new json
         end
