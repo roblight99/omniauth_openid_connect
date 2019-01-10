@@ -146,8 +146,21 @@ module OmniAuth
       end
 
       def public_key
-        return config.jwks if options.discovery
-        key_or_secret
+        if options.discovery
+          json = JSON.parse(config.jwks.to_json)
+          if json.has_key?('keys')
+            set = JSON::JWK::Set.new json['keys']
+            if set.length == 1
+              set[0]
+            else
+              set
+            end
+          else
+            JSON::JWK.new json
+          end
+        else
+          key_or_secret
+        end
       end
 
       private
